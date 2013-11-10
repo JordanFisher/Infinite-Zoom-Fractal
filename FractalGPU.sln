@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractalGpu", "FractalGpu\FractalGpu.csproj", "{7534FCCD-467A-4312-B9A9-47351EF6558B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractalGPU (Xbox 360)", "FractalGpu\FractalGPU (Xbox 360).csproj", "{2522C824-C1F4-4F04-8BEF-98C703BE7949}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content", "FractalGpu\Content\Content.contentproj", "{CE0C1B81-ECEF-490F-933A-E4E696B5E486}"
 EndProject
 Global
@@ -43,31 +41,6 @@ Global
 		{7534FCCD-467A-4312-B9A9-47351EF6558B}.Release|x86.ActiveCfg = Release|x86
 		{7534FCCD-467A-4312-B9A9-47351EF6558B}.Release|x86.Build.0 = Release|x86
 		{7534FCCD-467A-4312-B9A9-47351EF6558B}.Release|Xbox 360.ActiveCfg = Release|x86
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Debug|Mixed Platforms.ActiveCfg = Debug|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Debug|x86.ActiveCfg = Debug|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Debug|Xbox 360.Deploy.0 = Debug|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|Mixed Platforms.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|Mixed Platforms.Build.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|Mixed Platforms.Deploy.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|x86.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|Xbox 360.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Editor|Xbox 360.Deploy.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Mixed Platforms.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Mixed Platforms.Build.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Mixed Platforms.Deploy.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|x86.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Xbox 360.ActiveCfg = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Xbox 360.Build.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.PC|Xbox 360.Deploy.0 = Editor|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Mixed Platforms.ActiveCfg = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Mixed Platforms.Build.0 = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Mixed Platforms.Deploy.0 = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|x86.ActiveCfg = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Xbox 360.Build.0 = Release|Xbox 360
-		{2522C824-C1F4-4F04-8BEF-98C703BE7949}.Release|Xbox 360.Deploy.0 = Release|Xbox 360
 		{CE0C1B81-ECEF-490F-933A-E4E696B5E486}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{CE0C1B81-ECEF-490F-933A-E4E696B5E486}.Debug|x86.ActiveCfg = Debug|x86
 		{CE0C1B81-ECEF-490F-933A-E4E696B5E486}.Debug|Xbox 360.ActiveCfg = Debug|x86

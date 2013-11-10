@@ -1,3 +1,5 @@
+const float pi = 3.14159;
+
 float4 xCameraPos;
 float xCameraAngle;
 float xCameraAspect;

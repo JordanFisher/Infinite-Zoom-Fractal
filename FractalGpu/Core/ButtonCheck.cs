@@ -13,11 +13,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
-using Drawing;
-
-using FractalGpu;
-
-namespace FractalGpu
+namespace FractalGpu.Core
 {
     public enum ControllerButtons { A, B, X, Y, RS, LS, RT, LT, RJ, RJButton, LJ, LJButton, DPad, Start };
     public enum MashType { Hold, Tap, Alternate, HoldDir };

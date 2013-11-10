@@ -1,5 +1,4 @@
 using System;
-using Drawing;
 
 namespace FractalGpu
 {
@@ -17,7 +16,7 @@ namespace FractalGpu
         static void Main(string[] args) 
         {            
 #if GAME
-            using (Game1 game = new Game1())
+            using (FractalGame game = new FractalGame())
 #else
             using (Game_Editor game = new Game_Editor())            
 #endif

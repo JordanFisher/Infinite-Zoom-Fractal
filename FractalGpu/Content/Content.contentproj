@@ -47,22 +47,22 @@
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.XImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=None" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\BasicEffect.fx">
+    <Compile Include="Shaders\BasicEffect.fx">
       <Name>BasicEffect</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="Effects\Fractal.fx">
+    <Compile Include="Shaders\Fractal.fx">
       <Name>Fractal</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="Effects\Standard.fx">
+    <Compile Include="Shaders\Standard.fx">
       <Name>Standard</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <None Include="Effects\RootEffect.fx">
+    <None Include="Shaders\RootEffect.fx">
       <Name>RootEffect</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
