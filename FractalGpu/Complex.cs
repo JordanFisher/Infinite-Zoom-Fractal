@@ -1,11 +1,14 @@
-using Microsoft.Xna.Framework;
 using System;
+
+using Microsoft.Xna.Framework;
 
 namespace FractalGpu
 {
     public struct Complex
     {
         public double X, Y;
+
+		public static readonly Complex Zero = new Complex(0, 0), One = new Complex(1, 0);
 
         public Complex(double a, double b)
         {
@@ -102,25 +105,6 @@ namespace FractalGpu
         public override string ToString()
         {
             return string.Format("{0} + {1}i", X, Y);
-        }
-    }
-
-    public class FractalFunc
-    {
-        public static Complex Newton(Complex z)
-        {
-            return z - (z * z * z - (Complex)1) / ((Complex)3 * z * z); 
-        }
-
-        public static Complex Fractal(Complex z, Complex c)
-        {
-            return z * z + c;
-        }
-
-        public static Complex GoldenMean_rho = new Complex(-0.74405117795419151, -0.66812262690690249);
-        public static Complex GoldenMean(Complex z)
-        {
-            return z * z + GoldenMean_rho * z;
         }
     }
 }
