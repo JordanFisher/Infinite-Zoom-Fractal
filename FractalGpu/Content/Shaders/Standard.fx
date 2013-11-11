@@ -43,12 +43,9 @@ float Fractal(float2 pos, float2 c)
 	//float Min[3] = { 0, 0, 0 };
 	
 	float prev_d = 0;
-	//int ExtraReps = 45; // Good enough Julia
 	//int ExtraReps = 60; // Good enough Mandel
-	int ExtraReps = 10000; // Mandel, with no popping
-	//int ExtraReps = 65; // Julia
-	while (++count < 200 && d < CutOff)
-	//for (count = 0; count < 100 && d < CutOff; count++)
+	
+	for (count = 0; count < 100 && d < CutOff; count++)
 	//for (count = Count; count < Count + ExtraReps && d < CutOff; count++)
 	//for (count = 0; count < 50 && d < CutOff; count++)
 	//for (count = Count; count < Reps && d < CutOff; count++)	
@@ -86,7 +83,7 @@ float Fractal(float2 pos, float2 c)
 			//Min[i] = min(Min[i], MagSquared(pos - MinPoints[i]));
     }
 
-	return count;
+	//return count;
 	//return (count < Count + ExtraReps && d < CutOff) ? 0 : d;//log(log(d));
 
 	// Newton zero
@@ -137,9 +134,9 @@ float Fractal(float2 pos, float2 c)
     return cos(fancy_d) + 1;
     */
 
-    /* Binary
-	if (count < Count + ExtraReps && d < CutOff) return 0; else return 1;
-	*/
+    /* Binary */
+	return d < CutOff ? 1 : 0;
+	//if (count < Count + ExtraReps && d < CutOff) return 0; else return 1;
 }
 
 PixelToFrame FractalPixelShader(VertexToPixel PSIn)
@@ -167,13 +164,13 @@ PixelToFrame FractalPixelShader(VertexToPixel PSIn)
     else { d -= 2; baseColor.b = cos(pi*d/2); baseColor.r = sin(pi*d/2); }
     */
     
-	/* Gray scale bands */
+	/* Gray scale bands
 	baseColor.rgb = .5 * cos(d) + .5;
-
-	/* Binary
-	if (d > 1) baseColor = float4(.8,.2,.2,1);
-	else baseColor = float4(0,0,0,1);
 	*/
+
+	/* Binary */
+	if (d >= 1) baseColor = float4(.8,.2,.2,1);
+	else baseColor = float4(0,0,0,1);
 
 	/* Color cycling
 	baseColor.r = .25 * cos(d+t) + .2;

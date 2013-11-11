@@ -11,6 +11,9 @@ namespace FractalGpu
 {
 	public class GoldenMean : Fractal
 	{
+		public override Complex ViewWholeFractal_Pos  { get { return new Complex(0.353025315759074, 0.257824909262513); } }
+		public override double  ViewWholeFractal_Zoom { get { return 0.000630249409724609; } }
+
 		public GoldenMean()
 		{
 			Fx = new EzEffect(Tools.TheGame.Content, "Shaders\\Standard");
@@ -28,7 +31,8 @@ namespace FractalGpu
 			//C = FractalFunc.GoldenMean_rho = new Complex(-0.74405117795419151, -0.66812262690690249);
 
 			// Swirly Golden Mean
-			c = GoldenMean_rho = new Complex(-0.75905117795419151, -0.65812262690690249);
+			//c = GoldenMean_rho = new Complex(-0.75905117795419151, -0.65812262690690249);
+			c = GoldenMean_rho;
 
 			// Animated
 			//C = FractalFunc.GoldenMean_rho = new Complex(-0.74405117795419151 + 0.01 * Math.Cos(Tools.t / 10), -0.66812262690690249 + 0.01 * Math.Sin(Tools.t / 13));

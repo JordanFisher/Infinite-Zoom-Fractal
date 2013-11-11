@@ -11,6 +11,9 @@ namespace FractalGpu
 {
 	public class Fractal
 	{
+		public virtual Complex ViewWholeFractal_Pos  { get { return Complex.Zero; } }
+		public virtual double  ViewWholeFractal_Zoom { get { return .001; } }
+
 		protected EzEffect Fx;
 		
 		protected Complex c = (Complex)0;

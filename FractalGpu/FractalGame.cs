@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 using FractalGpu.Core;
 
@@ -25,8 +22,8 @@ namespace FractalGpu
 
         double Far = (double)10e10f;
 
-        Complex CamPos = new Complex((double)0, (double)0);
-        double CamZoom = (double)(.001);
+        Complex CamPos = new Complex(0, 0);
+        double CamZoom = .001;
 
 		Fractal CurFractal;
 
@@ -48,10 +45,41 @@ namespace FractalGpu
             Tools.TheGame = this;
         }
 
-        protected override void Initialize()
+		Texture2D CreateTexture(Complex CamPos, double CamZoom, int Width, int Height)
+		{
+			Color[] clr = new Color[Width * Height];
+
+            double zoom = .001 / CamZoom;
+            double a = AspectRatio;
+            Complex size = new Complex(zoom * a, zoom);
+
+            Complex TL	 = new Complex(CamPos.X - size.X, CamPos.Y + size.Y);
+            Complex Span = new Complex(2 * size.X, -2 * size.Y);
+
+			for (int i = 0; i < Width; i++)
+			{
+				for (int j = 0; j < Height; j++)
+				{
+					var z = TL + new Complex(i * Span.X / Width, j * Span.Y / Height);
+
+					for (int n = 0; n < 150 && z.LengthSquared() < 100; n++)
+						z = CurFractal.Iterate(z);
+
+					clr[i + j * Width] = z.Length() > 10 ? Color.Black : Color.White;
+				}
+			}
+
+			Texture2D Texture = new Texture2D(GraphicsDevice, Width, Height);
+			Texture.SetData(clr);
+
+			return Texture;
+		}
+
+		protected override void Initialize()
         {
-            Tools.DeviceManager.PreferredBackBufferWidth = 1280;
-			Tools.DeviceManager.PreferredBackBufferHeight = 720;
+			int Width = 1280, Height = 720;
+            Tools.DeviceManager.PreferredBackBufferWidth = Width;
+			Tools.DeviceManager.PreferredBackBufferHeight = Height;
             //graphics.IsFullScreen = true;
 			AspectRatio = Tools.DeviceManager.PreferredBackBufferWidth / Tools.DeviceManager.PreferredBackBufferHeight;
 
@@ -62,6 +90,13 @@ namespace FractalGpu
 			SetupIndices();
 
 			CurFractal = new GoldenMean();
+
+			var Texture = CreateTexture(CurFractal.ViewWholeFractal_Pos, CurFractal.ViewWholeFractal_Zoom, 2 * Width, 2 * Height);
+
+			using (var s = new FileStream("C:\\Users\\Ezra\\Desktop\\Fractal.png", FileMode.Create))
+			{
+				Texture.SaveAsPng(s, Texture.Width, Texture.Height);
+			}
 
             base.Initialize();
         }
@@ -246,10 +281,10 @@ namespace FractalGpu
 			Tools.SetStandardRenderStates();
 			GraphicsDevice.Clear(Color.Black);
 			
-			vertexData[TOP_RIGHT].TextureCoordinate		= new Vector2( (float)size.X*(float)AspectRatio,  (float)size.Y);
-			vertexData[BOTTOM_LEFT].TextureCoordinate	= new Vector2(-(float)size.X*(float)AspectRatio, -(float)size.Y);
-			vertexData[TOP_LEFT].TextureCoordinate		= new Vector2(-(float)size.X*(float)AspectRatio,  (float)size.Y);
-			vertexData[BOTTOM_RIGHT].TextureCoordinate	= new Vector2( (float)size.X*(float)AspectRatio, -(float)size.Y);
+			vertexData[TOP_RIGHT].TextureCoordinate		= new Vector2( (float)size.X,  (float)size.Y);
+			vertexData[BOTTOM_LEFT].TextureCoordinate	= new Vector2(-(float)size.X, -(float)size.Y);
+			vertexData[TOP_LEFT].TextureCoordinate		= new Vector2(-(float)size.X,  (float)size.Y);
+			vertexData[BOTTOM_RIGHT].TextureCoordinate	= new Vector2( (float)size.X, -(float)size.Y);
 
 			GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexData, 0, 4, indexData, 0, 2);
 
