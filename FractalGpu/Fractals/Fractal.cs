@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using FractalGpu.Core;
 
@@ -23,16 +24,14 @@ namespace FractalGpu
 		{
 		}
 
-		public virtual void SetGpuParameters(float[] MinDist, Vector2[] MinPoints, int NumMinPoints,
+		public virtual void SetGpuParameters(Texture2D ReferenceFractal,
 											 Complex h, Complex h2, Complex h3, Complex h4, Complex Center,
 											 int count, float D,
 											 Complex CamPos, double AspectRatio)
 		{
-			Fx.c.SetValue(c.ToVector2());
+			Fx.xTexture.SetValue(ReferenceFractal);
 
-			Fx.MinDist.SetValue(MinDist);
-			Fx.MinPoints.SetValue(MinPoints);
-			Fx.NumMinPoints.SetValue(NumMinPoints);
+			Fx.c.SetValue(c.ToVector2());
 
 			Fx.Rotate.SetValue(h.ToVector2());
 			Fx.h2.SetValue(h2.ToVector2());

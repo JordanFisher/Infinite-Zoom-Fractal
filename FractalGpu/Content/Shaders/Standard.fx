@@ -1,7 +1,8 @@
 ﻿#include "RootEffect.fx"
+#include "Util.fx"
 
 Texture xTexture;
-sampler TextureSampler : register(s1) = sampler_state { texture = <xTexture> ; magfilter = LINEAR; minfilter = LINEAR; mipfilter=LINEAR; };//AddressU = wrap; AddressV = clamp;};
+sampler TextureSampler : register(s1) = sampler_state { texture = <xTexture> ; magfilter = LINEAR; minfilter = LINEAR; mipfilter=LINEAR; AddressU = clamp; AddressV = clamp; };
 
 int Count;
 float2 Center, Rotate, h2, h3, h4;
@@ -13,34 +14,28 @@ float2 c;
 int Reps = 75;
 float CutOff = 10;
 
-float2 Div(float2 z, float2 w)
+float Lookup(float2 pos)
 {
-	if (w.x == 0 && w.y == 0) return float2(100000, 0);
-	else return float2(z.x * w.x + z.y * w.y, z.y * w.x - z.x * w.y) / (w.x * w.x + w.y * w.y);
+	float2 reference_center = float2(0.353025315759074, 0.257824909262513);
+	float reference_zoom = .001 / 0.000630249409724609;
+	float2 reference_BL = reference_center - float2(reference_zoom, reference_zoom);
+
+	float2 mapped_pos = (pos - reference_BL) / float2(2 * reference_zoom, 2 * reference_zoom);
+	mapped_pos.y = 1 - mapped_pos.y;
+	return tex2D(TextureSampler, mapped_pos).r;
 }
-
-float2 Mult(float2 z, float2 w)
-{
-	return float2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-float MagSquared(float2 z)
-{
-	return z.x * z.x + z.y * z.y;
-}
-
-
-float MinDist[3];
-float2 MinPoints[3];
-float NumMinPoints;
 
 float Fractal(float2 pos, float2 c)
 {
+	for (int i = 0; i < 31; i++)
+		pos = Mult(pos, pos) + Mult(c, pos);
+	return Lookup(pos);
+
+
+
 	float fancy_d = D;
 	float xtemp, d = 0, avg_d = 0;
 	int count = 0;
-	
-	//float Min[3] = { 0, 0, 0 };
 	
 	float prev_d = 0;
 	//int ExtraReps = 60; // Good enough Mandel
@@ -78,9 +73,6 @@ float Fractal(float2 pos, float2 c)
 		//fancy_d += .75 * log(2*log(2*log(d+2)+2)+2);
 		//fancy_d += .75 * log(.8*log(d+1)*(1 + .75 * sin(t/15)) + 1);
 		//fancy_d += log(log(d+1)+1);
-		
-		//for (int i = 0; i < NumMinPoints; i++)
-			//Min[i] = min(Min[i], MagSquared(pos - MinPoints[i]));
     }
 
 	//return count;
@@ -151,7 +143,6 @@ PixelToFrame FractalPixelShader(VertexToPixel PSIn)
 	//float2 delta4 = Mult(delta3, pos);
     pos = Center + Mult(delta, Rotate) + Mult(delta2, h2);// + Mult(delta3, h3) + Mult(delta4, h4);
 
-
 	// Julia
     float d = Fractal(pos, c); 
 
@@ -215,7 +206,6 @@ PixelToFrame MultisampleFractalPixelShader(VertexToPixel PSIn)
 	//float2 delta4 = Mult(delta3, pos);
     pos = Center + Mult(delta, Rotate) + Mult(delta2, h2);// + Mult(delta3, h3) + Mult(delta4, h4);
 
-
     baseColor.rgb *= 0;
 
     float d;
@@ -224,9 +214,6 @@ PixelToFrame MultisampleFractalPixelShader(VertexToPixel PSIn)
     //d = Fractal(pos, CamPos + PSIn.TexCoords); // Mandelbrot
 	
 	float3 color = 4 * ColorFunc(d);   
-
-
-	
 
 	float shift = .0021;
     d = Fractal(pos+float2(shift,0), c); // Julia
@@ -245,9 +232,6 @@ PixelToFrame MultisampleFractalPixelShader(VertexToPixel PSIn)
     //d = Fractal(pos, CamPos + PSIn.TexCoords); // Mandelbrot	
 	color += ColorFunc(d);   
 	
-	
-
-
 	shift *= 2;
     d = Fractal(pos+float2(shift,0), c); // Julia
     //d = Fractal(pos, CamPos + PSIn.TexCoords); // Mandelbrot	
@@ -265,8 +249,6 @@ PixelToFrame MultisampleFractalPixelShader(VertexToPixel PSIn)
     //d = Fractal(pos, CamPos + PSIn.TexCoords); // Mandelbrot	
 	color += ColorFunc(d);   
 
-
-        
     Output.Color.rgb = color / 12;
     Output.Color.a = 1;
 

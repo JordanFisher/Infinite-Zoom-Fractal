@@ -26,6 +26,7 @@ namespace FractalGpu
         double CamZoom = .001;
 
 		Fractal CurFractal;
+		Texture2D ReferenceFractal;
 
 		double AspectRatio;
 
@@ -91,12 +92,10 @@ namespace FractalGpu
 
 			CurFractal = new GoldenMean();
 
-			var Texture = CreateTexture(CurFractal.ViewWholeFractal_Pos, CurFractal.ViewWholeFractal_Zoom, 2 * Width, 2 * Height);
-
-			using (var s = new FileStream("C:\\Users\\Ezra\\Desktop\\Fractal.png", FileMode.Create))
-			{
-				Texture.SaveAsPng(s, Texture.Width, Texture.Height);
-			}
+			ReferenceFractal = Content.Load<Texture2D>("Fractals\\Fractal");
+			//var ReferenceFractal = CreateTexture(CurFractal.ViewWholeFractal_Pos, CurFractal.ViewWholeFractal_Zoom, 2 * Width, 2 * Height);
+			//using (var s = new FileStream("C:\\Users\\Ezra\\Desktop\\Fractal.png", FileMode.Create))
+			//    ReferenceFractal.SaveAsPng(s, Texture.Width, Texture.Height);
 
             base.Initialize();
         }
@@ -226,15 +225,6 @@ namespace FractalGpu
 			CurFractal.InitializeExpansion(CamPos, ref h, ref h2, ref h3, ref h4, ref Center);
 
             float D = 0;
-            int NumMinPoints = 3;
-            Vector2[] MinPoints = new Vector2[NumMinPoints];
-            float[] MinDist = new float[NumMinPoints];
-            for (int i = 0; i < NumMinPoints; i++)
-            {
-				MinPoints[i] = .6f * Tools.AngleToDir(2 * Math.PI / NumMinPoints * i + Tools.t) * (float)Math.Sin(2 * Tools.t);
-				MinPoints[i].X += .9f * (float)Math.Cos(1.5f * Tools.t);
-                MinDist[i] = 10000;
-            }
 
 			// CPU trace
 			//Complex z = CamPos + new Complex(.01, .01);
@@ -275,7 +265,7 @@ namespace FractalGpu
 
             Console.WriteLine("Depth: {0}", count);
 
-			CurFractal.SetGpuParameters(MinDist, MinPoints, NumMinPoints, h, h2, h3, h4, Center, count, D, CamPos, AspectRatio);
+			CurFractal.SetGpuParameters(ReferenceFractal, h, h2, h3, h4, Center, count, D, CamPos, AspectRatio);
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();

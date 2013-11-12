@@ -9,7 +9,7 @@ namespace FractalGpu.Core
 {
     public class EzEffect
     {
-		public EffectParameter c, MinDist, MinPoints, NumMinPoints, Rotate, h2, h3, h4, Center, Count, D, CamPos;
+		public EffectParameter c, Rotate, h2, h3, h4, Center, Count, D, CamPos;
 		public EffectParameter xTexture, xCameraAspect, xCameraPos;
 
         public Effect effect;
@@ -20,10 +20,6 @@ namespace FractalGpu.Core
 			effect = Content.Load<Effect>(file);
 			
 			c				= effect.Parameters["c"];
-
-			MinDist			= effect.Parameters["MinDist"];
-			MinPoints		= effect.Parameters["MinPoints"];
-			NumMinPoints	= effect.Parameters["NumMinPoints"];
 
 			Rotate			= effect.Parameters["Rotate"];
 			h2				= effect.Parameters["h2"];
