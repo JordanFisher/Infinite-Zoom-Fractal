@@ -36,6 +36,10 @@ namespace FractalGpu
 
 		public override void IterateExpansion(Complex Center, ref Complex h, ref Complex h2, ref Complex h3, ref Complex h4)
 		{
+			// For Mandelbrot
+			//if (count == 1) Corner[j, count] = FractalFunc.Fractal(C, Corner[j, 0]);
+			//else Corner[j, count] = FractalFunc.Fractal(Corner[j, count - 1], Corner[j, 0]);
+
 			if (CorrectionOrder >= 4) h4 = 2f * Center * h4 + h2 * h2;
 			if (CorrectionOrder >= 3) h3 = 2f * Center * h3 + 2f * h * h2;
 			if (CorrectionOrder >= 2) h2 = 2f * Center * h2 + h * h;

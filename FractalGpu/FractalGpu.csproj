@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Complex.cs" />
+    <Compile Include="Expansion.cs" />
     <Compile Include="Core\ButtonCheck.cs" />
     <Compile Include="Core\EzEffect.cs" />
     <Compile Include="Fractals\Newton.cs" />

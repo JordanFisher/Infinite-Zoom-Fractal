@@ -18,7 +18,7 @@ namespace FractalGpu
 		protected EzEffect Fx;
 		
 		protected Complex c = (Complex)0;
-		protected int CorrectionOrder = 1;
+		protected int CorrectionOrder = 4;
 
 		public virtual void SetTime(float t)
 		{
@@ -26,7 +26,7 @@ namespace FractalGpu
 
 		public virtual void SetGpuParameters(Texture2D ReferenceFractal,
 											 Complex h, Complex h2, Complex h3, Complex h4, Complex Center,
-											 int count, float D,
+											 int Count,
 											 Complex CamPos, double AspectRatio)
 		{
 			Fx.xTexture.SetValue(ReferenceFractal);
@@ -38,8 +38,7 @@ namespace FractalGpu
 			Fx.h3.SetValue(h3.ToVector2());
 			Fx.h4.SetValue(h4.ToVector2());
 			Fx.Center.SetValue(Center.ToVector2());
-			Fx.Count.SetValue(count);
-			Fx.D.SetValue(D);
+			Fx.Count.SetValue(Count);
 
 			Fx.CamPos.SetValue(CamPos.ToVector2());
 			Fx.Set(Vector2.Zero, 1, (float)AspectRatio);

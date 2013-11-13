@@ -27,7 +27,7 @@ float Lookup(float2 pos)
 
 float Fractal(float2 pos, float2 c)
 {
-	for (int i = 0; i < 31; i++)
+	for (int i = 0; i < 30; i++)
 		pos = Mult(pos, pos) + Mult(c, pos);
 	return Lookup(pos);
 
@@ -138,10 +138,10 @@ PixelToFrame FractalPixelShader(VertexToPixel PSIn)
     float2 pos = PSIn.TexCoords;
     
     float2 delta = pos;
-	float2 delta2 = Mult(delta, pos);
+	//float2 delta2 = Mult(delta, pos);
 	//float2 delta3 = Mult(delta2, pos);
 	//float2 delta4 = Mult(delta3, pos);
-    pos = Center + Mult(delta, Rotate) + Mult(delta2, h2);// + Mult(delta3, h3) + Mult(delta4, h4);
+    pos = Center + Mult(delta, Rotate);// + Mult(delta2, h2) + Mult(delta3, h3) + Mult(delta4, h4);
 
 	// Julia
     float d = Fractal(pos, c); 

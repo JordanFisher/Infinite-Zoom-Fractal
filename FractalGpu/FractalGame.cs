@@ -18,9 +18,6 @@ namespace FractalGpu
     public class FractalGame : Game
     {
         const int MaxIt = 1500;
-        Complex[,] Corner = new Complex[5, MaxIt];
-
-        double Far = (double)10e10f;
 
         Complex CamPos = new Complex(0, 0);
         double CamZoom = .001;
@@ -147,6 +144,13 @@ namespace FractalGpu
 
         protected void HandleInput()
         {
+			Tools.keybState = Keyboard.GetState();
+			Tools.CurMouseState = Mouse.GetState();
+			Tools.padState[0] = GamePad.GetState(PlayerIndex.One);
+			Tools.padState[1] = GamePad.GetState(PlayerIndex.Two);
+			Tools.padState[2] = GamePad.GetState(PlayerIndex.Three);
+			Tools.padState[3] = GamePad.GetState(PlayerIndex.Four);
+
             if (Tools.PrevKeyboardState == null) Tools.PrevKeyboardState = Tools.keybState;
 
             Tools.PrevKeyboardState = Tools.keybState;
@@ -190,13 +194,6 @@ namespace FractalGpu
             else
                 this.IsMouseVisible = false;
 
-            Tools.keybState = Keyboard.GetState();
-            Tools.CurMouseState = Mouse.GetState();
-            Tools.padState[0] = GamePad.GetState(PlayerIndex.One);
-            Tools.padState[1] = GamePad.GetState(PlayerIndex.Two);
-            Tools.padState[2] = GamePad.GetState(PlayerIndex.Three);
-            Tools.padState[3] = GamePad.GetState(PlayerIndex.Four);
-
             Tools.gameTime = gameTime;
 
             float new_t = (float)gameTime.TotalGameTime.TotalSeconds;
@@ -213,59 +210,34 @@ namespace FractalGpu
             double a = AspectRatio;
             Complex size = new Complex(zoom * a, zoom);
 
-            Corner[0, 0] = CamPos + size;
-            Corner[1, 0] = CamPos - size;
-            Corner[2, 0] = new Complex(CamPos.X + size.X, CamPos.Y - size.Y);
-            Corner[3, 0] = new Complex(CamPos.X - size.X, CamPos.Y + size.Y);
-            Corner[4, 0] = CamPos;
-
-			Complex h, h2, h3, h4, Center;
-			h = h2 = h3 = h4 = Center = Complex.Zero;
+			Complex h, h2, h3, h4, Center, Corner;
+			h = h2 = h3 = h4 = Complex.Zero;
+			Center = CamPos;
+			Corner = CamPos + size;
 
 			CurFractal.InitializeExpansion(CamPos, ref h, ref h2, ref h3, ref h4, ref Center);
-
-            float D = 0;
-
-			// CPU trace
-			//Complex z = CamPos + new Complex(.01, .01);
-			//for (int i = 0; i < 730; i++)
-			//{
-			//    z = FractalFunc.GoldenMean(z);
-			//}
-			//Console.WriteLine(z);
 
             int count = 1;
             for (count = 1; count < MaxIt; count++)
             {
-                for (int j = 0; j < 5; j++)
-                {
-                    if (j != 0 && j != 4)
-                        continue;
-					
-					Corner[j, count] = CurFractal.Iterate(Corner[j, count - 1]);
-
-					// For Mandelbrot
-					//if (count == 1) Corner[j, count] = FractalFunc.Fractal(C, Corner[j, 0]);
-					//else Corner[j, count] = FractalFunc.Fractal(Corner[j, count - 1], Corner[j, 0]);
-                }
-
-				// Bug: should stop only when approximation breaks down. Measure the higher order corrections. This is a hack currently.
-                if (Corner[4, count].LengthSquared() > Far)
-                    break;
-
-                float cutoff = .01f;
-                if ((Corner[0, count] - Corner[4, count]).Length() > cutoff) break;
+                if ((Corner - Center).Length() > .05f) break;
+				if ((h2 * size * size).Length() > .001f) break;
 
 				CurFractal.IterateExpansion(Center, ref h, ref h2, ref h3, ref h4);
 
-				Center = Corner[4, count];
+				Center = CurFractal.Iterate(Center);
+				Corner = CurFractal.Iterate(Corner);
 
                 float d = (float)Center.LengthSquared();
             }
 
-            Console.WriteLine("Depth: {0}", count);
+			//Console.WriteLine("Depth: {0}", count);
+			//Console.WriteLine("h  * size: {0}", h .Length() * size.Length());
+			//Console.WriteLine("h2 * size: {0}", h2 * size * size);
+			//Console.WriteLine("h3 * size: {0}", h3 * size * size * size);
+			//Console.WriteLine("h4 * size: {0}", h4 * size * size * size * size);
 
-			CurFractal.SetGpuParameters(ReferenceFractal, h, h2, h3, h4, Center, count, D, CamPos, AspectRatio);
+			CurFractal.SetGpuParameters(ReferenceFractal, h, h2, h3, h4, Center, count, CamPos, AspectRatio);
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();
