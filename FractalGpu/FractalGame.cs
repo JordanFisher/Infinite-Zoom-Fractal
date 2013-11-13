@@ -12,7 +12,7 @@ namespace FractalGpu
         const int MaxIt = 1500;
 
         Complex CamPos = new Complex(0, 0);
-        double CamZoom = .001;
+        double CamZoom = 1;
 
 		Fractal CurFractal;
 		Texture2D ReferenceFractal;
@@ -158,7 +158,7 @@ namespace FractalGpu
             {
                 Vector2 dir = ButtonCheck.GetDir(-1);
 
-                double scale = (double)(.03 * .001) / CamZoom;
+                double scale = .03 * CamZoom;
 
                 CamPos += scale * (Complex)dir;
 
@@ -166,12 +166,12 @@ namespace FractalGpu
 
                 if (ButtonCheck.State(ControllerButtons.B, -1).Down)
                 {
-                    CamZoom *= ZoomRate;
+                    CamZoom /= ZoomRate;
                 }
 
                 if (ButtonCheck.State(ControllerButtons.A, -1).Down)
                 {
-                    CamZoom /= ZoomRate;
+                    CamZoom *= ZoomRate;
                 }
             }
         }
@@ -198,9 +198,7 @@ namespace FractalGpu
 			CurFractal.SetTime(Tools.t);
 
             // Calculate high precision orbit of four corners
-            double zoom = .001 / CamZoom;
-            double a = AspectRatio;
-            Complex size = new Complex(zoom * a, zoom);
+			Complex size = new Complex(AspectRatio * CamZoom, CamZoom);
 
 			Expansion ex = CurFractal.InitializeExpansion(CamPos, size);
 
