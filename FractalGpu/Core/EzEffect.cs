@@ -9,7 +9,7 @@ namespace FractalGpu.Core
 {
     public class EzEffect
     {
-		public EffectParameter c, Rotate, h2, h3, h4, Center, Count, CamPos;
+		public EffectParameter c, h1, h2, h3, h4, Center, Count, CamPos;
 		public EffectParameter xTexture, xCameraAspect, xCameraPos;
 
         public Effect effect;
@@ -21,7 +21,7 @@ namespace FractalGpu.Core
 			
 			c				= effect.Parameters["c"];
 
-			Rotate			= effect.Parameters["Rotate"];
+			h1				= effect.Parameters["h1"];
 			h2				= effect.Parameters["h2"];
 			h3				= effect.Parameters["h3"];
 			h4				= effect.Parameters["h4"];

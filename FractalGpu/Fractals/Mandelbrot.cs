@@ -28,7 +28,7 @@ namespace FractalGpu
 		public virtual Expansion InitializeExpansion(Complex CamPos, Complex Size)
 		{
 			Expansion expansion = new Expansion(c, Size);
-			expansion.h  = (Complex)0;
+			expansion.h1  = (Complex)0;
 			expansion.h2 = (Complex)0;
 			expansion.h3 = (Complex)0;
 			expansion.h4 = (Complex)0;
@@ -43,9 +43,9 @@ namespace FractalGpu
 			//else Corner[j, count] = FractalFunc.Fractal(Corner[j, count - 1], Corner[j, 0]);
 
 			if (CorrectionOrder >= 4) ex.h4 = 2f * ex.Center * ex.h4 + ex.h2 * ex.h2;
-			if (CorrectionOrder >= 3) ex.h3 = 2f * ex.Center * ex.h3 + 2f * ex.h * ex.h2;
-			if (CorrectionOrder >= 2) ex.h2 = 2f * ex.Center * ex.h2 + ex.h * ex.h;
-			if (CorrectionOrder >= 1) ex.h  = 2f * ex.Center * ex.h  + (Complex)1;
+			if (CorrectionOrder >= 3) ex.h3 = 2f * ex.Center * ex.h3 + 2f * ex.h1 * ex.h2;
+			if (CorrectionOrder >= 2) ex.h2 = 2f * ex.Center * ex.h2 + ex.h1 * ex.h1;
+			if (CorrectionOrder >= 1) ex.h1  = 2f * ex.Center * ex.h1  + (Complex)1;
 		}
 	}
 }

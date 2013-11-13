@@ -6,11 +6,11 @@ namespace FractalGpu
 {
     public struct Expansion
     {
-		public Complex h, h2, h3, h4, Center, Corner;
+		public Complex h1, h2, h3, h4, Center, Corner;
 
 		public Expansion(Complex CamPos, Complex Size)
         {
-			h = h2 = h3 = h4 = Complex.Zero;
+			h1 = h2 = h3 = h4 = Complex.Zero;
 			
 			Center = CamPos;
 			Corner = CamPos + Size;
@@ -18,7 +18,7 @@ namespace FractalGpu
 
         public override string ToString()
         {
-            return string.Format("h * {0} + h^2 * {1}   at  {2}", h, h2, Center);
+            return string.Format("h * {0} + h^2 * {1}   at  {2}", h1, h2, Center);
         }
     }
 }

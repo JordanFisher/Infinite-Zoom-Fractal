@@ -33,7 +33,7 @@ namespace FractalGpu
 
 			Fx.c.SetValue(c.ToVector2());
 
-			Fx.Rotate.SetValue(ex.h.ToVector2());
+			Fx.h1.SetValue(ex.h1.ToVector2());
 			Fx.h2.SetValue(ex.h2.ToVector2());
 			Fx.h3.SetValue(ex.h3.ToVector2());
 			Fx.h4.SetValue(ex.h4.ToVector2());
@@ -47,7 +47,7 @@ namespace FractalGpu
 		public virtual Expansion InitializeExpansion(Complex CamPos, Complex Size)
 		{
 			Expansion expansion = new Expansion(CamPos, Size);
-			expansion.h  = (Complex)1;
+			expansion.h1  = (Complex)1;
 			expansion.h2 = (Complex)0;
 			expansion.h3 = (Complex)0;
 			expansion.h4 = (Complex)0;

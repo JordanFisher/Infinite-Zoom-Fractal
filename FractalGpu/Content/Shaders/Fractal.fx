@@ -1,6 +1,6 @@
 ﻿// not used
 int Count;
-float2 Center, Rotate, h2, h3, h4;
+float2 Center, h1, h2, h3, h4;
 float D;
 
 float2 CamPos;

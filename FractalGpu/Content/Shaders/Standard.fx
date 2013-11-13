@@ -5,7 +5,7 @@ Texture xTexture;
 sampler TextureSampler : register(s1) = sampler_state { texture = <xTexture> ; magfilter = LINEAR; minfilter = LINEAR; mipfilter=LINEAR; AddressU = clamp; AddressV = clamp; };
 
 int Count;
-float2 Center, Rotate, h2, h3, h4;
+float2 Center, h1, h2, h3, h4;
 float D;
 
 float2 CamPos;
@@ -141,7 +141,7 @@ PixelToFrame FractalPixelShader(VertexToPixel PSIn)
 	//float2 delta2 = Mult(delta, pos);
 	//float2 delta3 = Mult(delta2, pos);
 	//float2 delta4 = Mult(delta3, pos);
-    pos = Center + Mult(delta, Rotate);// + Mult(delta2, h2) + Mult(delta3, h3) + Mult(delta4, h4);
+    pos = Center + Mult(delta, h1);// + Mult(delta2, h2) + Mult(delta3, h3) + Mult(delta4, h4);
 
 	// Julia
     float d = Fractal(pos, c); 
@@ -204,7 +204,7 @@ PixelToFrame MultisampleFractalPixelShader(VertexToPixel PSIn)
 	float2 delta2 = Mult(delta, pos);
 	//float2 delta3 = Mult(delta2, pos);
 	//float2 delta4 = Mult(delta3, pos);
-    pos = Center + Mult(delta, Rotate) + Mult(delta2, h2);// + Mult(delta3, h3) + Mult(delta4, h4);
+    pos = Center + Mult(delta, h1) + Mult(delta2, h2);// + Mult(delta3, h3) + Mult(delta4, h4);
 
     baseColor.rgb *= 0;
 

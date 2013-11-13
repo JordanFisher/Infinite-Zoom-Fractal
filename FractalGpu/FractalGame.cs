@@ -214,8 +214,6 @@ namespace FractalGpu
 
 				ex.Center = CurFractal.Iterate(ex.Center);
 				ex.Corner = CurFractal.Iterate(ex.Corner);
-
-				float d = (float)ex.Center.LengthSquared();
             }
 
 			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, CamPos, AspectRatio);

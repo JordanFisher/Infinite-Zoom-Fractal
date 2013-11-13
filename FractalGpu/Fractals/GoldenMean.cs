@@ -41,9 +41,9 @@ namespace FractalGpu
 		public override void IterateExpansion(ref Expansion ex)
 		{
 			if (CorrectionOrder >= 4) ex.h4 = (2f * ex.Center + GoldenMean_rho) * ex.h4 + ex.h2 * ex.h2;
-			if (CorrectionOrder >= 3) ex.h3 = (2f * ex.Center + GoldenMean_rho) * ex.h3 + 2f * ex.h * ex.h2;
-			if (CorrectionOrder >= 2) ex.h2 = (2f * ex.Center + GoldenMean_rho) * ex.h2 + ex.h * ex.h;
-			if (CorrectionOrder >= 1) ex.h  = (2f * ex.Center + GoldenMean_rho) * ex.h;
+			if (CorrectionOrder >= 3) ex.h3 = (2f * ex.Center + GoldenMean_rho) * ex.h3 + 2f * ex.h1 * ex.h2;
+			if (CorrectionOrder >= 2) ex.h2 = (2f * ex.Center + GoldenMean_rho) * ex.h2 + ex.h1 * ex.h1;
+			if (CorrectionOrder >= 1) ex.h1  = (2f * ex.Center + GoldenMean_rho) * ex.h1;
 		}
 	}
 }
