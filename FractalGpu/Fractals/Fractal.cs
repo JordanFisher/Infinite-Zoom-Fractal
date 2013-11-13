@@ -25,7 +25,7 @@ namespace FractalGpu
 		}
 
 		public virtual void SetGpuParameters(Texture2D ReferenceFractal,
-											 Complex h, Complex h2, Complex h3, Complex h4, Complex Center,
+											 Expansion ex,
 											 int Count,
 											 Complex CamPos, double AspectRatio)
 		{
@@ -33,24 +33,26 @@ namespace FractalGpu
 
 			Fx.c.SetValue(c.ToVector2());
 
-			Fx.Rotate.SetValue(h.ToVector2());
-			Fx.h2.SetValue(h2.ToVector2());
-			Fx.h3.SetValue(h3.ToVector2());
-			Fx.h4.SetValue(h4.ToVector2());
-			Fx.Center.SetValue(Center.ToVector2());
+			Fx.Rotate.SetValue(ex.h.ToVector2());
+			Fx.h2.SetValue(ex.h2.ToVector2());
+			Fx.h3.SetValue(ex.h3.ToVector2());
+			Fx.h4.SetValue(ex.h4.ToVector2());
+			Fx.Center.SetValue(ex.Center.ToVector2());
 			Fx.Count.SetValue(Count);
 
 			Fx.CamPos.SetValue(CamPos.ToVector2());
 			Fx.Set(Vector2.Zero, 1, (float)AspectRatio);
 		}
 
-		public virtual void InitializeExpansion(Complex CamPos, ref Complex h, ref Complex h2, ref Complex h3, ref Complex h4, ref Complex Center)
+		public virtual Expansion InitializeExpansion(Complex CamPos, Complex Size)
 		{
-			h =  (Complex)1;
-			h2 = (Complex)0;
-			h3 = (Complex)0;
-			h4 = (Complex)0;
-			Center = CamPos;
+			Expansion expansion = new Expansion(CamPos, Size);
+			expansion.h  = (Complex)1;
+			expansion.h2 = (Complex)0;
+			expansion.h3 = (Complex)0;
+			expansion.h4 = (Complex)0;
+
+			return expansion;
 		}
 
 		public virtual Complex Iterate(Complex z)
@@ -58,7 +60,7 @@ namespace FractalGpu
 			return (Complex)0;
 		}
 
-		public virtual void IterateExpansion(Complex Center, ref Complex h, ref Complex h2, ref Complex h3, ref Complex h4)
+		public virtual void IterateExpansion(ref Expansion ex)
 		{
 		}
 	}

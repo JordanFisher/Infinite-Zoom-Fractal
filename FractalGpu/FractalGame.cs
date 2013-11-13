@@ -1,15 +1,7 @@
-using System;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 using FractalGpu.Core;
 
@@ -210,34 +202,23 @@ namespace FractalGpu
             double a = AspectRatio;
             Complex size = new Complex(zoom * a, zoom);
 
-			Complex h, h2, h3, h4, Center, Corner;
-			h = h2 = h3 = h4 = Complex.Zero;
-			Center = CamPos;
-			Corner = CamPos + size;
-
-			CurFractal.InitializeExpansion(CamPos, ref h, ref h2, ref h3, ref h4, ref Center);
+			Expansion ex = CurFractal.InitializeExpansion(CamPos, size);
 
             int count = 1;
             for (count = 1; count < MaxIt; count++)
             {
-                if ((Corner - Center).Length() > .05f) break;
-				if ((h2 * size * size).Length() > .001f) break;
+				if ((ex.Corner - ex.Center).Length() > .05f) break;
+				if ((ex.h2 * size * size).Length() > .001f) break;
 
-				CurFractal.IterateExpansion(Center, ref h, ref h2, ref h3, ref h4);
+				CurFractal.IterateExpansion(ref ex);
 
-				Center = CurFractal.Iterate(Center);
-				Corner = CurFractal.Iterate(Corner);
+				ex.Center = CurFractal.Iterate(ex.Center);
+				ex.Corner = CurFractal.Iterate(ex.Corner);
 
-                float d = (float)Center.LengthSquared();
+				float d = (float)ex.Center.LengthSquared();
             }
 
-			//Console.WriteLine("Depth: {0}", count);
-			//Console.WriteLine("h  * size: {0}", h .Length() * size.Length());
-			//Console.WriteLine("h2 * size: {0}", h2 * size * size);
-			//Console.WriteLine("h3 * size: {0}", h3 * size * size * size);
-			//Console.WriteLine("h4 * size: {0}", h4 * size * size * size * size);
-
-			CurFractal.SetGpuParameters(ReferenceFractal, h, h2, h3, h4, Center, count, CamPos, AspectRatio);
+			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, CamPos, AspectRatio);
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();

@@ -38,12 +38,12 @@ namespace FractalGpu
 			//C = FractalFunc.GoldenMean_rho = new Complex(-0.74405117795419151 + 0.01 * Math.Cos(Tools.t / 10), -0.66812262690690249 + 0.01 * Math.Sin(Tools.t / 13));
 		}
 
-		public override void IterateExpansion(Complex Center, ref Complex h, ref Complex h2, ref Complex h3, ref Complex h4)
+		public override void IterateExpansion(ref Expansion ex)
 		{
-			if (CorrectionOrder >= 4) h4 = (2f * Center + GoldenMean_rho) * h4 + h2 * h2;
-			if (CorrectionOrder >= 3) h3 = (2f * Center + GoldenMean_rho) * h3 + 2f * h * h2;
-			if (CorrectionOrder >= 2) h2 = (2f * Center + GoldenMean_rho) * h2 + h * h;
-			if (CorrectionOrder >= 1) h =  (2f * Center + GoldenMean_rho) * h;
+			if (CorrectionOrder >= 4) ex.h4 = (2f * ex.Center + GoldenMean_rho) * ex.h4 + ex.h2 * ex.h2;
+			if (CorrectionOrder >= 3) ex.h3 = (2f * ex.Center + GoldenMean_rho) * ex.h3 + 2f * ex.h * ex.h2;
+			if (CorrectionOrder >= 2) ex.h2 = (2f * ex.Center + GoldenMean_rho) * ex.h2 + ex.h * ex.h;
+			if (CorrectionOrder >= 1) ex.h  = (2f * ex.Center + GoldenMean_rho) * ex.h;
 		}
 	}
 }

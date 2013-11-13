@@ -27,12 +27,12 @@ namespace FractalGpu
 			//C = new Complex(.4 + Math.Sin(Step), -.35 + Math.Cos(1.11f * Step));
 		}
 
-		public override void IterateExpansion(Complex Center, ref Complex h, ref Complex h2, ref Complex h3, ref Complex h4)
+		public override void IterateExpansion(ref Expansion ex)
 		{
-			if (CorrectionOrder >= 4) h4 = 2f * Center * h4 + h2 * h2;
-			if (CorrectionOrder >= 3) h3 = 2f * Center * h3 + 2f * h * h2;
-			if (CorrectionOrder >= 2) h2 = 2f * Center * h2 + h * h;
-			if (CorrectionOrder >= 1) h *= 2f * Center;
+			if (CorrectionOrder >= 4) ex.h4 = 2f * ex.Center * ex.h4 + ex.h2 * ex.h2;
+			if (CorrectionOrder >= 3) ex.h3 = 2f * ex.Center * ex.h3 + 2f * ex.h * ex.h2;
+			if (CorrectionOrder >= 2) ex.h2 = 2f * ex.Center * ex.h2 + ex.h * ex.h;
+			if (CorrectionOrder >= 1) ex.h *= 2f * ex.Center;
 		}
 	}
 }

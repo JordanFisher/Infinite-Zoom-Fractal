@@ -6,7 +6,7 @@ namespace FractalGpu
 {
     public struct Expansion
     {
-		Complex h, h2, h3, h4, Center, Corner;
+		public Complex h, h2, h3, h4, Center, Corner;
 
 		public Expansion(Complex CamPos, Complex Size)
         {
