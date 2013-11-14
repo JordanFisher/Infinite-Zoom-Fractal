@@ -28,10 +28,10 @@ namespace FractalGpu
 		public virtual Expansion InitializeExpansion(Complex CamPos, Complex Size)
 		{
 			Expansion expansion = new Expansion(c, Size);
-			expansion.h1  = (Complex)0;
-			expansion.h2 = (Complex)0;
-			expansion.h3 = (Complex)0;
-			expansion.h4 = (Complex)0;
+			expansion.a1  = (Complex)0;
+			expansion.a2 = (Complex)0;
+			expansion.a3 = (Complex)0;
+			expansion.a4 = (Complex)0;
 
 			return expansion;
 		}
@@ -42,10 +42,10 @@ namespace FractalGpu
 			//if (count == 1) Corner[j, count] = FractalFunc.Fractal(C, Corner[j, 0]);
 			//else Corner[j, count] = FractalFunc.Fractal(Corner[j, count - 1], Corner[j, 0]);
 
-			if (CorrectionOrder >= 4) ex.h4 = 2f * ex.Center * ex.h4 + ex.h2 * ex.h2;
-			if (CorrectionOrder >= 3) ex.h3 = 2f * ex.Center * ex.h3 + 2f * ex.h1 * ex.h2;
-			if (CorrectionOrder >= 2) ex.h2 = 2f * ex.Center * ex.h2 + ex.h1 * ex.h1;
-			if (CorrectionOrder >= 1) ex.h1  = 2f * ex.Center * ex.h1  + (Complex)1;
+			if (CorrectionOrder >= 4) ex.a4 = 2f * ex.a0 * ex.a4 + ex.a2 * ex.a2;
+			if (CorrectionOrder >= 3) ex.a3 = 2f * ex.a0 * ex.a3 + 2f * ex.a1 * ex.a2;
+			if (CorrectionOrder >= 2) ex.a2 = 2f * ex.a0 * ex.a2 + ex.a1 * ex.a1;
+			if (CorrectionOrder >= 1) ex.a1  = 2f * ex.a0 * ex.a1  + (Complex)1;
 		}
 	}
 }

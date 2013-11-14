@@ -11,8 +11,11 @@ namespace FractalGpu
     {
         const int MaxIt = 1500;
 
-        Complex CamPos = new Complex(0, 0);
+        Complex CamPos1 = new Complex(0, 0);
+		Complex CamPos2 = new Complex(0, 0);
         double CamZoom = 1;
+
+		double Threshold = 1e-12;
 
 		Fractal CurFractal;
 		Texture2D ReferenceFractal;
@@ -160,7 +163,14 @@ namespace FractalGpu
 
                 double scale = .03 * CamZoom;
 
-                CamPos += scale * (Complex)dir;
+				if (CamZoom > Threshold)
+				{
+					CamPos1 += scale * (Complex)dir;
+				}
+				else
+				{
+					CamPos2 += scale * (Complex)dir;
+				}
 
                 double ZoomRate = .95;
 
@@ -198,32 +208,53 @@ namespace FractalGpu
 			CurFractal.SetTime(Tools.t);
 
             // Calculate high precision orbit of four corners
-			Complex size = new Complex(AspectRatio * CamZoom, CamZoom);
+			double zoom1 = CamZoom > Threshold ? CamZoom : Threshold;
+			Expansion ex1 = CurFractal.InitializeExpansion(CamPos1, new Complex(AspectRatio * zoom1, zoom1));
 
-			Expansion ex = CurFractal.InitializeExpansion(CamPos, size);
-
-            int count = 1;
-            for (count = 1; count < MaxIt; count++)
+            int count1 = 1;
+            for (count1 = 1; count1 < MaxIt; count1++)
             {
-				if ((ex.Corner - ex.Center).Length() > .05f) break;
-				if ((ex.h2 * size * size).Length() > .001f) break;
+				if ((ex1.Corner - ex1.a0).Length() > .05f) break;
+				if ((ex1.a2 * ex1.Size * ex1.Size).Length() > .001f) break;
 
-				CurFractal.IterateExpansion(ref ex);
+				CurFractal.IterateExpansion(ref ex1);
 
-				ex.Center = CurFractal.Iterate(ex.Center);
-				ex.Corner = CurFractal.Iterate(ex.Corner);
+				ex1.a0 = CurFractal.Iterate(ex1.a0);
+				ex1.Corner = CurFractal.Iterate(ex1.Corner);
             }
 
-			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, CamPos, AspectRatio);
+			
+			Expansion ex2 = ex1;
+			ex2.ShiftCenter(CamPos2);
+			double zoom2 = CamZoom;
+			ex2.Size = new Complex(AspectRatio * zoom2, zoom2);
+			ex2.Corner = ex2.a0 + ex2.Size;
+
+			int count2 = 1;
+			for (count2 = 1; count2 < MaxIt; count2++)
+			{
+				if ((ex2.Corner - ex2.a0).Length() > .05f) break;
+				if ((ex2.a2 * ex2.Size * ex2.Size).Length() > .001f) break;
+
+				CurFractal.IterateExpansion(ref ex2);
+
+				ex2.a0 = CurFractal.Iterate(ex2.a0);
+				ex2.Corner = CurFractal.Iterate(ex2.Corner);
+			}
+
+
+			//Expansion ex = ex1; int count = count1;
+			Expansion ex = ex2; int count = count1 + count2;
+			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, CamPos1, AspectRatio);
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();
 			GraphicsDevice.Clear(Color.Black);
-			
-			vertexData[TOP_RIGHT].TextureCoordinate		= new Vector2( (float)size.X,  (float)size.Y);
-			vertexData[BOTTOM_LEFT].TextureCoordinate	= new Vector2(-(float)size.X, -(float)size.Y);
-			vertexData[TOP_LEFT].TextureCoordinate		= new Vector2(-(float)size.X,  (float)size.Y);
-			vertexData[BOTTOM_RIGHT].TextureCoordinate	= new Vector2( (float)size.X, -(float)size.Y);
+
+			vertexData[TOP_RIGHT].TextureCoordinate		= new Vector2( (float)ex.Size.X,  (float)ex.Size.Y);
+			vertexData[BOTTOM_LEFT].TextureCoordinate	= new Vector2(-(float)ex.Size.X, -(float)ex.Size.Y);
+			vertexData[TOP_LEFT].TextureCoordinate		= new Vector2(-(float)ex.Size.X,  (float)ex.Size.Y);
+			vertexData[BOTTOM_RIGHT].TextureCoordinate	= new Vector2( (float)ex.Size.X, -(float)ex.Size.Y);
 
 			GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexData, 0, 4, indexData, 0, 2);
 
