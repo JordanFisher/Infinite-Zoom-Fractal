@@ -7,15 +7,22 @@ using FractalGpu.Core;
 
 namespace FractalGpu
 {
+	public struct ZoomPiece
+	{
+		public Complex CamPos;
+		public Expansion T;
+
+		public double Threshold;
+	}
+
     public class FractalGame : Game
     {
         const int MaxIt = 1500;
 
-        Complex CamPos1 = new Complex(0, 0);
-		Complex CamPos2 = new Complex(0, 0);
+		const int MaxZoomPieces = 100;
+		ZoomPiece[] Pieces = new ZoomPiece[MaxZoomPieces];
         double CamZoom = 1;
 
-		double Threshold = 1e-12;
 
 		Fractal CurFractal;
 		Texture2D ReferenceFractal;
@@ -84,6 +91,8 @@ namespace FractalGpu
 
 			CurFractal = new GoldenMean();
 
+			SetupZoomPieces();
+
 			ReferenceFractal = Content.Load<Texture2D>("Fractals\\Fractal");
 			//var ReferenceFractal = CreateTexture(CurFractal.ViewWholeFractal_Pos, CurFractal.ViewWholeFractal_Zoom, 2 * Width, 2 * Height);
 			//using (var s = new FileStream("C:\\Users\\Ezra\\Desktop\\Fractal.png", FileMode.Create))
@@ -91,6 +100,18 @@ namespace FractalGpu
 
             base.Initialize();
         }
+
+		private void SetupZoomPieces()
+		{
+			double ThresholdIncrement = 1e-12;
+			double Threshold = ThresholdIncrement;
+
+			for (int i = 0; i < MaxZoomPieces; i++)
+			{
+				Pieces[i].Threshold = Threshold;
+				Threshold *= ThresholdIncrement;
+			}
+		}
 
 		private void SetupVertices(Color color)
 		{
@@ -163,14 +184,20 @@ namespace FractalGpu
 
                 double scale = .03 * CamZoom;
 
-				if (CamZoom > Threshold)
+				int i = 0;
+				while (i < MaxZoomPieces)
 				{
-					CamPos1 += scale * (Complex)dir;
+					if (CamZoom > Pieces[i].Threshold) break;
+					i++;
 				}
-				else
+
+				for (int j = i + 1; j < MaxZoomPieces; j++)
 				{
-					CamPos2 += scale * (Complex)dir;
+					Pieces[i].CamPos += Pieces[j].CamPos;
+					Pieces[j].CamPos = Complex.Zero;
 				}
+
+				Pieces[i].CamPos += scale * (Complex)dir;
 
                 double ZoomRate = .95;
 
@@ -207,9 +234,61 @@ namespace FractalGpu
 			// Set fractal parameters
 			CurFractal.SetTime(Tools.t);
 
+			bool BottomReached = false;
+			int CountTotal = 0;
+
+			int i = 0;
+			while (i < MaxZoomPieces && !BottomReached)
+			{
+				double zoom;
+
+				if (CamZoom > Pieces[i].Threshold)
+				{
+					zoom = CamZoom;
+					BottomReached = true;
+				}
+				else
+				{
+					zoom = Pieces[i].Threshold;
+				}
+
+				if (i == 0)
+				{
+					Pieces[i].T = CurFractal.InitializeExpansion(Pieces[i].CamPos, new Complex(AspectRatio * zoom, zoom));
+				}
+				else
+				{
+					Pieces[i].T = Pieces[i - 1].T;
+					Pieces[i].T.ShiftCenter(Pieces[i].CamPos);
+					Pieces[i].T.Size = new Complex(AspectRatio * zoom, zoom);
+					Pieces[i].T.Corner = Pieces[i].T.a0 + Pieces[i].T.Size;
+				}
+
+				int count = 1;
+				for (; count < MaxIt; count++)
+				{
+					if ((Pieces[i].T.Corner - Pieces[i].T.a0).Length() > .05f) break;
+					if ((Pieces[i].T.a2 * Pieces[i].T.Size * Pieces[i].T.Size).Length() > .001f) break;
+
+					CurFractal.IterateExpansion(ref Pieces[i].T);
+
+					Pieces[i].T.a0 = CurFractal.Iterate(Pieces[i].T.a0);
+					Pieces[i].T.Corner = CurFractal.Iterate(Pieces[i].T.Corner);
+				}
+
+				CountTotal += count;
+
+				if (!BottomReached) i++;
+			}
+
+			Expansion ex = Pieces[i].T;
+			CurFractal.SetGpuParameters(ReferenceFractal, ex, CountTotal, Complex.Zero /* warning wtf */, AspectRatio);
+
+
+			/*
             // Calculate high precision orbit of four corners
-			double zoom1 = CamZoom > Threshold ? CamZoom : Threshold;
-			Expansion ex1 = CurFractal.InitializeExpansion(CamPos1, new Complex(AspectRatio * zoom1, zoom1));
+			double zoom1 = CamZoom > ZoomPiece.Threshold ? CamZoom : ZoomPiece.Threshold;
+			Expansion ex1 = CurFractal.InitializeExpansion(p1.CamPos, new Complex(AspectRatio * zoom1, zoom1));
 
             int count1 = 1;
             for (count1 = 1; count1 < MaxIt; count1++)
@@ -225,7 +304,7 @@ namespace FractalGpu
 
 			
 			Expansion ex2 = ex1;
-			ex2.ShiftCenter(CamPos2);
+			ex2.ShiftCenter(p2.CamPos);
 			double zoom2 = CamZoom;
 			ex2.Size = new Complex(AspectRatio * zoom2, zoom2);
 			ex2.Corner = ex2.a0 + ex2.Size;
@@ -242,10 +321,10 @@ namespace FractalGpu
 				ex2.Corner = CurFractal.Iterate(ex2.Corner);
 			}
 
-
 			//Expansion ex = ex1; int count = count1;
 			Expansion ex = ex2; int count = count1 + count2;
-			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, CamPos1, AspectRatio);
+			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, p1.CamPos, AspectRatio);
+			*/
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();
