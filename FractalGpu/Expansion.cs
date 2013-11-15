@@ -7,6 +7,7 @@ namespace FractalGpu
     public struct Expansion
     {
 		public Complex a1, a2, a3, a4, a0, Corner, Size;
+		public int IterationCount;
 
 		public Expansion(Complex CamPos, Complex Size)
         {
@@ -15,6 +16,8 @@ namespace FractalGpu
 			a0 = CamPos;
 			this.Size = Size;
 			Corner = CamPos + Size;
+
+			IterationCount = 0;
         }
 
 		public void ShiftCenter(Complex Shift)
@@ -30,7 +33,7 @@ namespace FractalGpu
 		public void Normalize()
 		{
 			//double Length = a1.Length();
-			double Length = 1e5;
+			double Length = ZoomPiece.OneOver_ZoomThreshold;
 			
 			a1 /= Length;
 			a2 /= Length * Length;

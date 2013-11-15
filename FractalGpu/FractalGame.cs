@@ -14,16 +14,24 @@ namespace FractalGpu
 
 		public Expansion T;
 
-		public double Threshold;
+		public const double ZoomThreshold = 1e-12;
+		public const double OneOver_ZoomThreshold = 1 / ZoomThreshold;
+
+		public bool RequiresUpdate;
+
+		public void Initialize()
+		{
+			CamPos = Complex.Zero;
+			CamZoom = 1;
+
+			RequiresUpdate = true;
+		}
 	}
 
     public class FractalGame : Game
     {
-        const int MaxIt = 1500;
-
-		const int MaxZoomPieces = 100;
+		const int MaxZoomPieces = 10000;
 		ZoomPiece[] Pieces = new ZoomPiece[MaxZoomPieces];
-
 
 		Fractal CurFractal;
 		Texture2D ReferenceFractal;
@@ -92,30 +100,16 @@ namespace FractalGpu
 
 			CurFractal = new GoldenMean();
 
-			SetupZoomPieces();
-
 			ReferenceFractal = Content.Load<Texture2D>("Fractals\\Fractal");
 			//var ReferenceFractal = CreateTexture(CurFractal.ViewWholeFractal_Pos, CurFractal.ViewWholeFractal_Zoom, 2 * Width, 2 * Height);
 			//using (var s = new FileStream("C:\\Users\\Ezra\\Desktop\\Fractal.png", FileMode.Create))
 			//    ReferenceFractal.SaveAsPng(s, Texture.Width, Texture.Height);
 
+			for (int i = 0; i < MaxZoomPieces; i++)
+				Pieces[i].Initialize();
+
             base.Initialize();
         }
-
-		private void SetupZoomPieces()
-		{
-			double ThresholdIncrement = 1e-5;
-			double Threshold = ThresholdIncrement;
-
-			for (int i = 0; i < MaxZoomPieces; i++)
-			{
-				Pieces[i].CamZoom = 1;
-				Pieces[i].Threshold = ThresholdIncrement;
-
-				//Pieces[i].Threshold = Threshold;
-				//Threshold *= ThresholdIncrement;
-			}
-		}
 
 		private void SetupVertices(Color color)
 		{
@@ -189,7 +183,7 @@ namespace FractalGpu
 				int i = 0;
 				while (i < MaxZoomPieces)
 				{
-					if (Pieces[i].CamZoom > Pieces[i].Threshold) break;
+					if (Pieces[i].CamZoom > ZoomPiece.ZoomThreshold) break;
 					i++;
 				}
 
@@ -201,16 +195,11 @@ namespace FractalGpu
 
 					Pieces[j].CamPos = Complex.Zero;
 					Pieces[j].CamZoom = 1;
+
+					Pieces[j].RequiresUpdate = true;
 				}
 
-				//for (int j = i + 1; j < MaxZoomPieces; j++)
-				//{
-				//    Pieces[i].CamPos += Pieces[j].CamPos;
-					
-				//    Pieces[j].CamPos = Complex.Zero;
-				//    Pieces[j].CamZoom = 1;
-				//}
-
+				// Update the current ZoomPiece
 				Pieces[i].CamPos += .03 * Pieces[i].CamZoom * (Complex)dir;
 
                 double ZoomRate = .95;
@@ -224,6 +213,16 @@ namespace FractalGpu
                 {
 					Pieces[i].CamZoom *= ZoomRate;
                 }
+
+				//if (i > 0 && Pieces[i].CamPos.Length() * Pieces[i - 1].CamZoom > Pieces[i - 1].T.Size.Length() / 8)
+				//{
+				//    Pieces[i - 1].CamPos += Pieces[i].CamPos * Pieces[i - 1].CamZoom;
+				//    Pieces[i].CamPos = Complex.Zero;
+
+				//    Pieces[i - 1].RequiresUpdate = true;
+				//}
+
+				Pieces[i].RequiresUpdate = true;
             }
         }
 
@@ -249,110 +248,67 @@ namespace FractalGpu
 			CurFractal.SetTime(Tools.t);
 
 			bool BottomReached = false;
-			int CountTotal = 0;
 
 			int i = 0;
 			while (i < MaxZoomPieces && !BottomReached)
 			{
-				double zoom;
+				double zoom = Pieces[i].CamZoom;
 
-				if (Pieces[i].CamZoom > Pieces[i].Threshold)
+				if (zoom > ZoomPiece.ZoomThreshold)
 				{
-					zoom = Pieces[i].CamZoom;
 					BottomReached = true;
 				}
-				else
-				{
-					zoom = Pieces[i].CamZoom;
-					//zoom = Pieces[i].Threshold;
-				}
 
-				if (i == 0)
+				if (Pieces[i].RequiresUpdate)
 				{
-					Pieces[i].T = CurFractal.InitializeExpansion(Pieces[i].CamPos, new Complex(AspectRatio * zoom, zoom));
-				}
-				else
-				{
-					Pieces[i].T = Pieces[i - 1].T;
-					Pieces[i].T.Normalize();
-					Pieces[i].T.ShiftCenter(Pieces[i].CamPos);
-					Pieces[i].T.Size = new Complex(AspectRatio * zoom, zoom);
-					Pieces[i].T.Corner = Pieces[i].T.a0 + Pieces[i].T.Size;
-				}
-
-				// We know that Pieces[i].T is valid starting out.
-				// We store it for future use, because we may need to back-track if we transform Pieces[i].T into something invalid.
-				Expansion ValidExpansion = Pieces[i].T;
-
-				int count = 1;
-				for (; count < MaxIt; count++)
-				{
-					//if ((Pieces[i].T.Corner - Pieces[i].T.a0).Length() > .05f) break;
-					if ((Pieces[i].T.a2 * Pieces[i].T.Size * Pieces[i].T.Size).Length() > .001f)
+					if (i == 0)
 					{
-						Pieces[i].T = ValidExpansion;
-						break;
+						Pieces[i].T = CurFractal.InitializeExpansion(Pieces[i].CamPos, new Complex(AspectRatio * zoom, zoom));
+					}
+					else
+					{
+						Pieces[i].T = Pieces[i - 1].T;
+						Pieces[i].T.Normalize();
+						Pieces[i].T.ShiftCenter(Pieces[i].CamPos);
+						Pieces[i].T.Size = new Complex(AspectRatio * zoom, zoom);
+						Pieces[i].T.Corner = Pieces[i].T.a0 + Pieces[i].T.Size;
 					}
 
-					ValidExpansion = Pieces[i].T;
+					// We know that Pieces[i].T is valid starting out.
+					// We store it for future use, because we may need to back-track if we transform Pieces[i].T into something invalid.
+					Expansion ValidExpansion = Pieces[i].T;
 
-					CurFractal.IterateExpansion(ref Pieces[i].T);
+					while (true)
+					{
+						// This checks to the see if the expansion is invalid by seeing if the distance from center to corner is too large.
+						// It appears we don't need this, and the Taylor series error approximation is sufficient.
+						//if ((Pieces[i].T.Corner - Pieces[i].T.a0).Length() > .05f) break;
+						
+						if ((Pieces[i].T.a2 * Pieces[i].T.Size * Pieces[i].T.Size).Length() > .001f)
+						{
+							// The expansion has become invalid. Backtrack one step and exit the iteration loop.
+							Pieces[i].T = ValidExpansion;
+							break;
+						}
 
-					Pieces[i].T.a0 = CurFractal.Iterate(Pieces[i].T.a0);
-					Pieces[i].T.Corner = CurFractal.Iterate(Pieces[i].T.Corner);
+						ValidExpansion = Pieces[i].T;
+
+						CurFractal.IterateExpansion(ref Pieces[i].T);
+
+						Pieces[i].T.a0 = CurFractal.Iterate(Pieces[i].T.a0);
+						Pieces[i].T.Corner = CurFractal.Iterate(Pieces[i].T.Corner);
+
+						Pieces[i].T.IterationCount++;
+					}
 				}
 
-				CountTotal += count;
+				Pieces[i].RequiresUpdate = false;
 
 				if (!BottomReached) i++;
 			}
 
 			Expansion ex = Pieces[i].T;
-			ex.Size *= 1000;
-			ex.a1 /= 1000;
-			CurFractal.SetGpuParameters(ReferenceFractal, ex, CountTotal, Complex.Zero /* warning wtf */, AspectRatio);
-
-
-			/*
-            // Calculate high precision orbit of four corners
-			double zoom1 = CamZoom > ZoomPiece.Threshold ? CamZoom : ZoomPiece.Threshold;
-			Expansion ex1 = CurFractal.InitializeExpansion(p1.CamPos, new Complex(AspectRatio * zoom1, zoom1));
-
-            int count1 = 1;
-            for (count1 = 1; count1 < MaxIt; count1++)
-            {
-				if ((ex1.Corner - ex1.a0).Length() > .05f) break;
-				if ((ex1.a2 * ex1.Size * ex1.Size).Length() > .001f) break;
-
-				CurFractal.IterateExpansion(ref ex1);
-
-				ex1.a0 = CurFractal.Iterate(ex1.a0);
-				ex1.Corner = CurFractal.Iterate(ex1.Corner);
-            }
-
-			
-			Expansion ex2 = ex1;
-			ex2.ShiftCenter(p2.CamPos);
-			double zoom2 = CamZoom;
-			ex2.Size = new Complex(AspectRatio * zoom2, zoom2);
-			ex2.Corner = ex2.a0 + ex2.Size;
-
-			int count2 = 1;
-			for (count2 = 1; count2 < MaxIt; count2++)
-			{
-				if ((ex2.Corner - ex2.a0).Length() > .05f) break;
-				if ((ex2.a2 * ex2.Size * ex2.Size).Length() > .001f) break;
-
-				CurFractal.IterateExpansion(ref ex2);
-
-				ex2.a0 = CurFractal.Iterate(ex2.a0);
-				ex2.Corner = CurFractal.Iterate(ex2.Corner);
-			}
-
-			//Expansion ex = ex1; int count = count1;
-			Expansion ex = ex2; int count = count1 + count2;
-			CurFractal.SetGpuParameters(ReferenceFractal, ex, count, p1.CamPos, AspectRatio);
-			*/
+			CurFractal.SetGpuParameters(ReferenceFractal, ex, Complex.Zero /* warning wtf */, AspectRatio);
 
 			Tools.Device.SetRenderTarget(null);
 			Tools.SetStandardRenderStates();

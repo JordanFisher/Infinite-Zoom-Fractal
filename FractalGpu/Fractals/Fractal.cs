@@ -26,7 +26,6 @@ namespace FractalGpu
 
 		public virtual void SetGpuParameters(Texture2D ReferenceFractal,
 											 Expansion ex,
-											 int Count,
 											 Complex CamPos, double AspectRatio)
 		{
 			Fx.xTexture.SetValue(ReferenceFractal);
@@ -38,7 +37,7 @@ namespace FractalGpu
 			Fx.h3.SetValue(ex.a3.ToVector2());
 			Fx.h4.SetValue(ex.a4.ToVector2());
 			Fx.Center.SetValue(ex.a0.ToVector2());
-			Fx.Count.SetValue(Count);
+			Fx.Count.SetValue(ex.IterationCount);
 
 			Fx.CamPos.SetValue(CamPos.ToVector2());
 			Fx.Set(Vector2.Zero, 1, (float)AspectRatio);
