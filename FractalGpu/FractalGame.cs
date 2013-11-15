@@ -10,6 +10,8 @@ namespace FractalGpu
 	public struct ZoomPiece
 	{
 		public Complex CamPos;
+		public double CamZoom;
+
 		public Expansion T;
 
 		public double Threshold;
@@ -21,7 +23,6 @@ namespace FractalGpu
 
 		const int MaxZoomPieces = 100;
 		ZoomPiece[] Pieces = new ZoomPiece[MaxZoomPieces];
-        double CamZoom = 1;
 
 
 		Fractal CurFractal;
@@ -103,13 +104,16 @@ namespace FractalGpu
 
 		private void SetupZoomPieces()
 		{
-			double ThresholdIncrement = 1e-12;
+			double ThresholdIncrement = 1e-5;
 			double Threshold = ThresholdIncrement;
 
 			for (int i = 0; i < MaxZoomPieces; i++)
 			{
-				Pieces[i].Threshold = Threshold;
-				Threshold *= ThresholdIncrement;
+				Pieces[i].CamZoom = 1;
+				Pieces[i].Threshold = ThresholdIncrement;
+
+				//Pieces[i].Threshold = Threshold;
+				//Threshold *= ThresholdIncrement;
 			}
 		}
 
@@ -182,33 +186,43 @@ namespace FractalGpu
             {
                 Vector2 dir = ButtonCheck.GetDir(-1);
 
-                double scale = .03 * CamZoom;
-
 				int i = 0;
 				while (i < MaxZoomPieces)
 				{
-					if (CamZoom > Pieces[i].Threshold) break;
+					if (Pieces[i].CamZoom > Pieces[i].Threshold) break;
 					i++;
 				}
 
-				for (int j = i + 1; j < MaxZoomPieces; j++)
+				if (i > 0 && Pieces[i].CamZoom > 1) i--;
+
+				for (int j = MaxZoomPieces - 1; j >= i + 1; j--)
 				{
-					Pieces[i].CamPos += Pieces[j].CamPos;
+					Pieces[j-1].CamPos += Pieces[j].CamPos * Pieces[j-1].CamZoom;
+
 					Pieces[j].CamPos = Complex.Zero;
+					Pieces[j].CamZoom = 1;
 				}
 
-				Pieces[i].CamPos += scale * (Complex)dir;
+				//for (int j = i + 1; j < MaxZoomPieces; j++)
+				//{
+				//    Pieces[i].CamPos += Pieces[j].CamPos;
+					
+				//    Pieces[j].CamPos = Complex.Zero;
+				//    Pieces[j].CamZoom = 1;
+				//}
+
+				Pieces[i].CamPos += .03 * Pieces[i].CamZoom * (Complex)dir;
 
                 double ZoomRate = .95;
 
                 if (ButtonCheck.State(ControllerButtons.B, -1).Down)
                 {
-                    CamZoom /= ZoomRate;
+					Pieces[i].CamZoom /= ZoomRate;
                 }
 
                 if (ButtonCheck.State(ControllerButtons.A, -1).Down)
                 {
-                    CamZoom *= ZoomRate;
+					Pieces[i].CamZoom *= ZoomRate;
                 }
             }
         }
@@ -242,14 +256,15 @@ namespace FractalGpu
 			{
 				double zoom;
 
-				if (CamZoom > Pieces[i].Threshold)
+				if (Pieces[i].CamZoom > Pieces[i].Threshold)
 				{
-					zoom = CamZoom;
+					zoom = Pieces[i].CamZoom;
 					BottomReached = true;
 				}
 				else
 				{
-					zoom = Pieces[i].Threshold;
+					zoom = Pieces[i].CamZoom;
+					//zoom = Pieces[i].Threshold;
 				}
 
 				if (i == 0)
@@ -259,16 +274,27 @@ namespace FractalGpu
 				else
 				{
 					Pieces[i].T = Pieces[i - 1].T;
+					Pieces[i].T.Normalize();
 					Pieces[i].T.ShiftCenter(Pieces[i].CamPos);
 					Pieces[i].T.Size = new Complex(AspectRatio * zoom, zoom);
 					Pieces[i].T.Corner = Pieces[i].T.a0 + Pieces[i].T.Size;
 				}
 
+				// We know that Pieces[i].T is valid starting out.
+				// We store it for future use, because we may need to back-track if we transform Pieces[i].T into something invalid.
+				Expansion ValidExpansion = Pieces[i].T;
+
 				int count = 1;
 				for (; count < MaxIt; count++)
 				{
-					if ((Pieces[i].T.Corner - Pieces[i].T.a0).Length() > .05f) break;
-					if ((Pieces[i].T.a2 * Pieces[i].T.Size * Pieces[i].T.Size).Length() > .001f) break;
+					//if ((Pieces[i].T.Corner - Pieces[i].T.a0).Length() > .05f) break;
+					if ((Pieces[i].T.a2 * Pieces[i].T.Size * Pieces[i].T.Size).Length() > .001f)
+					{
+						Pieces[i].T = ValidExpansion;
+						break;
+					}
+
+					ValidExpansion = Pieces[i].T;
 
 					CurFractal.IterateExpansion(ref Pieces[i].T);
 
@@ -282,6 +308,8 @@ namespace FractalGpu
 			}
 
 			Expansion ex = Pieces[i].T;
+			ex.Size *= 1000;
+			ex.a1 /= 1000;
 			CurFractal.SetGpuParameters(ReferenceFractal, ex, CountTotal, Complex.Zero /* warning wtf */, AspectRatio);
 
 

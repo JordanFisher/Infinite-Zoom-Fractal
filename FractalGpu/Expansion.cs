@@ -27,6 +27,19 @@ namespace FractalGpu
 			a3 =								  1 * a3	  + 4 * a4 * s1;
 		}
 
+		public void Normalize()
+		{
+			//double Length = a1.Length();
+			double Length = 1e5;
+			
+			a1 /= Length;
+			a2 /= Length * Length;
+			a3 /= Length * Length * Length;
+			a4 /= Length * Length * Length * Length;
+
+			Size *= Length;
+		}
+
         public override string ToString()
         {
             return string.Format("h * {0} + h^2 * {1}   at  {2}", a1, a2, a0);
